@@ -9,7 +9,9 @@ training = pd.read_csv("training.csv",
                        names=['name', 'fga'],
                        dtype={'name': object, 'fga': float})
 
-def transform_pcf(patch_size=512, limit=None, partial_save=False):
+def transform_pcf(output_dir="",
+                  patch_size=32,
+                  limit=None):
     training = pd.read_csv("training.csv", 
                            header=None,
                            names=['name', 'fga'],
@@ -17,8 +19,6 @@ def transform_pcf(patch_size=512, limit=None, partial_save=False):
     if limit:
         training = training.head(limit)
     from skimage.io import imsave
-    all_patches = []
-    output = []
     for i, row in training.iterrows():
         row_patches = []
         row_output = []
@@ -32,24 +32,14 @@ def transform_pcf(patch_size=512, limit=None, partial_save=False):
             img_patches = transform_img(img, name, patch_size=patch_size)
             for img_patch in img_patches:
                 for rot_i in range(4):
-                    all_patches.append(np.rot90(img_patch, k=rot_i))
                     row_patches.append(np.rot90(img_patch, k=rot_i))
-                    output.append(fga)
                     row_output.append(fga)
         X_row = np.asarray(row_patches)
         y_row = np.asarray(row_output)
-        if partial_save:
-            with open("X_file_%s" % name, 'w') as f:
-                np.save(f, X_row)
-            with open("y_file_%s" % name, 'w') as f:
-                np.save(f, y_row)
-    X = np.asarray(all_patches)
-    y = np.asarray(output)
-    with open("X_file", 'w') as f:
-        np.save(f, X)
-    with open("y_file", 'w') as f:
-        np.save(f, y)
-    return X, y
+        with open(path.join(output_dir, "X_file_%s" % name), 'w') as f:
+            np.save(f, X_row)
+        with open(path.join(output_dir, "y_file_%s" % name), 'w') as f:
+            np.save(f, y_row)
 
 def transform_img(img, name, patch_size):
     from skimage.transform import rotate
@@ -77,4 +67,4 @@ def transform_img(img, name, patch_size):
                 patches.append(patch)
     return patches
 
-transform_pcf()
+transform_pcf(output_dir="data")
