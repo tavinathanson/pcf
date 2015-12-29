@@ -11,6 +11,7 @@ training = pd.read_csv("training.csv",
 
 def transform_pcf(output_dir="",
                   patch_size=32,
+                  rotations=4,
                   limit=None):
     training = pd.read_csv("training.csv", 
                            header=None,
@@ -31,7 +32,7 @@ def transform_pcf(output_dir="",
             img = imread("images/%s/%s-%s.png" % (kind, name, kind))
             img_patches = transform_img(img, name, patch_size=patch_size)
             for img_patch in img_patches:
-                for rot_i in range(4):
+                for rot_i in range(rotations):
                     row_patches.append(np.rot90(img_patch, k=rot_i))
                     row_output.append(fga)
         X_row = np.asarray(row_patches)
@@ -67,4 +68,5 @@ def transform_img(img, name, patch_size):
                 patches.append(patch)
     return patches
 
-transform_pcf(output_dir="data")
+if __name__ == "__main__":
+    transform_pcf(output_dir="data-256", patch_size=256)
