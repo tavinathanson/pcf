@@ -4,10 +4,19 @@ from skimage.data import imread
 from skimage.io import imshow
 import numpy as np
 
-training = pd.read_csv("training.csv", 
+def load_testing():
+    testing = pd.read_csv("test.csv", 
+                       header=None,
+                       names=['name'],
+                       dtype={'name': object})
+    return testing
+
+def load_training():
+    training = pd.read_csv("training.csv", 
                        header=None,
                        names=['name', 'fga'],
                        dtype={'name': object, 'fga': float})
+    return training
 
 def transform_pcf(output_dir="",
                   patch_size=32,
